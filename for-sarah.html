@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>For Sarah</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #F5F0FF;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 1.25rem 1rem 3.5rem;
+      overflow-x: hidden;
+    }
+
+    .screen { display: none; width: 100%; max-width: 440px; }
+    .screen.active { display: block; animation: fadeUp 0.35s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(18px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .page-header { text-align: center; padding: 0.5rem 0 1.1rem; }
+    .page-label  { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #B4B2A9; }
+    .page-name   { font-size: 32px; font-weight: 700; color: #2C2C2A; margin-top: 2px; }
+
+    .msg-card {
+      background: #fff;
+      border-radius: 22px;
+      border: 1px solid rgba(0,0,0,0.07);
+      overflow: hidden;
+      margin-bottom: 0.85rem;
+    }
+
+    .card-stripe { height: 5px; }
+    .stripe-sophiya { background: linear-gradient(90deg, #7F77DD, #D85A30); }
+    .stripe-alanna  { background: linear-gradient(90deg, #1D9E75, #7F77DD); }
+    .stripe-justin  { background: linear-gradient(90deg, #378ADD, #1D9E75); }
+    .stripe-scott   { background: linear-gradient(90deg, #D85A30, #BA7517); }
+
+    .card-inner { padding: 1.4rem 1.4rem 1.3rem; }
+
+    .card-from-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 1rem;
+    }
+    .avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; flex-shrink: 0;
+    }
+    .av-sophiya { background: #EEEDFE; color: #534AB7; }
+    .av-alanna  { background: #E1F5EE; color: #0F6E56; }
+    .av-justin  { background: #E6F1FB; color: #185FA5; }
+    .av-scott   { background: #FAECE7; color: #993C1D; }
+
+    .from-name { font-size: 15px; font-weight: 600; color: #2C2C2A; }
+    .from-role { font-size: 12px; color: #888780; }
+
+    .msg-body { font-size: 15.5px; line-height: 1.75; color: #444441; }
+    .msg-body p { margin-bottom: 0.9rem; }
+    .msg-body p:last-child { margin-bottom: 0; }
+
+    .callout {
+      background: #EEEDFE;
+      border-left: 3px solid #7F77DD;
+      border-radius: 0 10px 10px 0;
+      padding: 0.8rem 1rem;
+      margin: 0.9rem 0;
+      font-style: italic;
+      font-size: 15px;
+      color: #3C3489;
+      line-height: 1.65;
+    }
+
+    .glossary-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-family: inherit; color: #534AB7;
+      background: #EEEDFE; border: none; border-radius: 20px;
+      padding: 7px 14px; cursor: pointer; margin-top: 1rem;
+    }
+
+    .glossary-box {
+      display: none; background: #F5F3FF; border-radius: 14px;
+      padding: 1rem 1.1rem; margin-top: 0.75rem;
+    }
+    .glossary-box.open { display: block; }
+
+    .glossary-heading {
+      font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.09em; color: #534AB7; margin-bottom: 0.75rem;
+    }
+
+    .glossary-row { display: flex; gap: 10px; align-items: baseline; font-size: 13.5px; margin-bottom: 7px; color: #2C2C2A; }
+    .glossary-row:last-child { margin-bottom: 0; }
+    .g-term { font-weight: 600; min-width: 52px; flex-shrink: 0; }
+    .g-def  { color: #5F5E5A; line-height: 1.5; }
+
+    .secret-tap {
+      display: block; font-size: 15px; color: #D3D1C7;
+      cursor: pointer; user-select: none; margin-top: 1.25rem;
+      text-align: center; transition: color 0.2s;
+    }
+    .secret-tap:hover, .secret-tap:active { color: #D85A30; }
+
+    /* GAME */
+    .game-header {
+      background: #fff; border-radius: 20px;
+      border: 1px solid rgba(0,0,0,0.07);
+      padding: 1.25rem 1.4rem; margin-bottom: 0.85rem;
+    }
+    .game-title { font-size: 21px; font-weight: 700; color: #2C2C2A; }
+    .game-sub   { font-size: 13px; color: #888780; margin-top: 2px; }
+
+    .score-row { display: flex; gap: 8px; margin-top: 10px; }
+    .pill { font-size: 12px; border-radius: 20px; padding: 4px 13px; }
+    .pill-green { background: #EAF3DE; color: #3B6D11; }
+    .pill-coral { background: #FAECE7; color: #993C1D; }
+
+    .milestone-banner {
+      display: none; background: #EEEDFE; border-radius: 14px;
+      padding: 0.85rem 1.1rem; font-size: 14.5px; font-weight: 500;
+      color: #3C3489; text-align: center; margin-bottom: 0.85rem; line-height: 1.55;
+    }
+    .milestone-banner.show { display: block; animation: fadeUp 0.3s ease; }
+
+    .req-card {
+      background: #fff; border-radius: 20px;
+      border: 1px solid rgba(0,0,0,0.07);
+      padding: 1.4rem 1.3rem 1.3rem; margin-bottom: 0.85rem;
+      min-height: 130px; display: flex; flex-direction: column;
+      gap: 10px; transition: opacity 0.25s;
+    }
+    .req-meta { display: flex; justify-content: space-between; align-items: center; }
+    .req-sender { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: #888780; }
+    .req-badge  { font-size: 10.5px; border-radius: 6px; padding: 2px 8px; font-weight: 500; }
+    .badge-urgent { background: #FCEBEB; color: #A32D2D; }
+    .badge-normal { background: #FAEEDA; color: #854F0B; }
+    .req-text { font-size: 16.5px; line-height: 1.55; color: #2C2C2A; flex: 1; }
+
+    .btn-row { display: flex; gap: 10px; margin-bottom: 0.85rem; }
+    .btn-game {
+      flex: 1; padding: 1rem; border: none; border-radius: 16px;
+      font-size: 15.5px; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: transform 0.12s;
+    }
+    .btn-game:active { transform: scale(0.96); }
+    .btn-approve  { background: #EAF3DE; color: #27500A; }
+    .btn-delegate { background: #FAECE7; color: #712B13; }
+
+    .feedback-bar {
+      background: #fff; border: 1px solid rgba(0,0,0,0.07); border-radius: 12px;
+      padding: 0.7rem 1rem; font-size: 13.5px; color: #5F5E5A; text-align: center;
+      min-height: 42px; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 0.85rem; line-height: 1.45;
+    }
+
+    .btn-back {
+      display: block; width: 100%; padding: 0.7rem; background: none;
+      border: 1px solid rgba(0,0,0,0.1); border-radius: 12px;
+      font-size: 13.5px; color: #888780; font-family: inherit; cursor: pointer;
+    }
+
+    .hidden-card { display: none; }
+
+    .reveal-btn {
+      display: block;
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: #fff;
+      border: 1.5px dashed rgba(127,119,221,0.4);
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #534AB7;
+      font-family: inherit;
+      cursor: pointer;
+      margin-bottom: 0.85rem;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .reveal-btn:hover, .reveal-btn:active { background: #EEEDFE; border-color: #7F77DD; }
+
+    .confetti-dot {
+      position: fixed; pointer-events: none; z-index: 9999;
+      border-radius: 2px; animation: cf-fall linear forwards;
+    }
+    @keyframes cf-fall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      80%  { opacity: 1; }
+      100% { transform: translateY(105vh) rotate(540deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- CARD SCREEN -->
+<div class="screen active" id="s-card">
+
+  <div class="page-header">
+    <p class="page-label">A note for</p>
+    <p class="page-name">Sarah &#129505;</p>
+  </div>
+
+  <!-- Sophiya -->
+  <div class="msg-card">
+    <div class="card-stripe stripe-sophiya"></div>
+    <div class="card-inner">
+      <div class="card-from-row">
+        <div class="avatar av-sophiya">S</div>
+        <div>
+          <p class="from-name">Sophiya</p>
+          <p class="from-role">The Janitor &#128579;</p>
+        </div>
+      </div>
+      <div class="msg-body">
+        <p>This is an official, fully documented notification that you are an excellent boss &#128519;</p>
+        <p>You show up and you whip us into shape — and you bring the energy and clarity when we're running on fumes. You make real decisions without making people feel stupid for asking. You care — about the work, and the people behind them.</p>
+        <div class="callout">"You are the Head of Operations — but really, you're like the super glue with glitter that brings competent people together."</div>
+        <p>We see you working hard. But we also see that you're just another fellow human being who is allowed to have a terrible time, close Teams and Outlook at 4:01pm, and let things wait until you're back on your feet.</p>
+        <p>You are also another fellow human who deserves more than a crappy micro-managing emotional wreck for a boss. We don't blame you in the slightest.</p>
+        <p>You got this — whatever the choice is. And if you don't 'got this' right now — that's also fine. We have your back. I have your back.</p>
+        <p>We're here when you're ready — likely in a repeat meeting about a meeting on a note from a meeting.</p>
+      </div>
+
+      <button class="glossary-toggle" onclick="toggleGlossary()">&#128218;&nbsp; Modern Communication Decoder</button>
+      <div class="glossary-box" id="glossary">
+        <p class="glossary-heading">Official Emoji &amp; Abbreviation Reference Guide (v1.0)</p>
+        <div class="glossary-row"><span class="g-term">LOL</span><span class="g-def">Laughing Out Loud. A positive expression. Not a sign-off.</span></div>
+        <div class="glossary-row"><span class="g-term">FR</span><span class="g-def">For Real. Expresses sincerity. Unrelated to France.</span></div>
+        <div class="glossary-row"><span class="g-term">NGL</span><span class="g-def">Not Gonna Lie. An honesty disclaimer before a strong opinion.</span></div>
+        <div class="glossary-row"><span class="g-term">IKR</span><span class="g-def">I Know, Right? Full agreement. Often used enthusiastically.</span></div>
+        <div class="glossary-row"><span class="g-term">SMH</span><span class="g-def">Shaking My Head. Mild to moderate disappointment. Not a medical term.</span></div>
+        <div class="glossary-row"><span class="g-term">&#128293;</span><span class="g-def">Fire emoji. Means something is extremely good OR everything is in crisis. Context dependent.</span></div>
+        <div class="glossary-row"><span class="g-term">&#128128;</span><span class="g-def">Skull emoji. Extremely bad situation, OR something was so funny it was fatal. Tone matters.</span></div>
+        <div class="glossary-row"><span class="g-term">&#128557;</span><span class="g-def">Crying laughing face. Positive. Despite visual appearance, no one is upset.</span></div>
+        <div class="glossary-row"><span class="g-term">&#129300;</span><span class="g-def">Thinking face. Deep in thought, OR mild concern, OR passive disagreement.</span></div>
+        <div class="glossary-row"><span class="g-term">&#129488;</span><span class="g-def">Face with spiral eyes. Overwhelmed. Used when words are insufficient.</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <button class="reveal-btn" id="reveal-1" onclick="revealNext(1)">+ There's more — tap to open</button>
+
+  <!-- Alanna -->
+  <div class="msg-card hidden-card" id="card-1">
+    <div class="card-stripe stripe-alanna"></div>
+    <div class="card-inner">
+      <div class="card-from-row">
+        <div class="avatar av-alanna">A</div>
+        <div>
+          <p class="from-name">Alanna</p>
+          <p class="from-role">The Vibes &amp; Walking HR Violation 🫠</p>
+        </div>
+      </div>
+      <div class="msg-body">
+        <p>I miss my mummy and hope that she's taking care of her health.</p>
+        <p>I am manifesting a new role for her where she is surrounded by good people who respect her and can appreciate all the experience she brings to the position. &#10024;</p>
+      </div>
+    </div>
+  </div>
+
+  <button class="reveal-btn hidden-card" id="reveal-2" onclick="revealNext(2)">+ Keep going</button>
+
+  <!-- Justin -->
+  <div class="msg-card hidden-card" id="card-2">
+    <div class="card-stripe stripe-justin"></div>
+    <div class="card-inner">
+      <div class="card-from-row">
+        <div class="avatar av-justin">J</div>
+        <div>
+          <p class="from-name">Justin</p>
+          <p class="from-role">The Wet Boy &#128166;</p>
+        </div>
+      </div>
+      <div class="msg-body">
+        <p>The A team are thinking of you and can't wait to see you back!</p>
+        <p>Stay Strong! &#128170;</p>
+      </div>
+    </div>
+  </div>
+
+  <button class="reveal-btn hidden-card" id="reveal-3" onclick="revealNext(3)">+ One more</button>
+
+  <!-- Scott -->
+  <div class="msg-card hidden-card" id="card-3">
+    <div class="card-stripe stripe-scott"></div>
+    <div class="card-inner">
+      <div class="card-from-row">
+        <div class="avatar av-scott">Sc</div>
+        <div>
+          <p class="from-name">Scott</p>
+          <p class="from-role">The Magician Who Can Pull Money From Anywhere &#128514;</p>
+        </div>
+      </div>
+      <div class="msg-body">
+        <p>Hey Sarah, sorry to hear you are not feeling well — not ideal for you at all.</p>
+        <p>I know you have been under a lot of pressure of late which is most likely causing you to have to take time off. Make sure you're actually resting and switching off work completely!!!</p>
+        <p>We'll keep things ticking along here, so your only job right now is to get back to 100%. And when you are… I think it's only fair we mark the occasion with a couple of margaritas — purely for recovery purposes, of course.</p>
+        <p>Take care of yourself matey and see you when you are feeling better.</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="secret-tap hidden-card" id="card-secret" onclick="startGame()">There's nothing here — You don't need to click this for sure.</p>
+
+
+<!-- GAME SCREEN -->
+<div class="screen" id="s-game">
+  <div class="game-header">
+    <p class="game-title">The Delegation Desk</p>
+    <p class="game-sub">Your inbox. Infinite. Your call.</p>
+    <div class="score-row">
+      <span class="pill pill-green">Approved: <span id="ct-approve">0</span></span>
+      <span class="pill pill-coral">Delegated: <span id="ct-delegate">0</span></span>
+    </div>
+  </div>
+
+  <div class="milestone-banner" id="milestone"></div>
+
+  <div class="req-card" id="req-card">
+    <div class="req-meta">
+      <span class="req-sender" id="req-from">From: —</span>
+      <span class="req-badge" id="req-badge">NORMAL</span>
+    </div>
+    <p class="req-text" id="req-text">Loading…</p>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-game btn-approve"  onclick="act('approve')">Approve</button>
+    <button class="btn-game btn-delegate" onclick="act('delegate')">Delegate</button>
+  </div>
+
+  <div class="feedback-bar" id="feedback">Tap a button to make a decision.</div>
+  <button class="btn-back" onclick="goBack()">&#8592; Back to card</button>
+</div>
+
+
+<script>
+  const REQUESTS = [
+    { text: "Can we move the ERP go-live to never?", from: "Anonymous", urgent: true },
+    { text: "I need approval to order 47 Post-it notes. It is urgent.", from: "Supply Chain", urgent: false },
+    { text: "Someone ate the Grainwaves I stole from the kitchen again. Requesting full HR intervention and a food audit.", from: "Staff (Hungry)", urgent: true },
+    { text: "Quick question — can we undo last quarter?", from: "Finance", urgent: true },
+    { text: "Requesting an emergency nap room in Wellness Room Level 10. For productivity.", from: "The Team", urgent: false },
+    { text: "Vendor has confirmed delivery in 2–4 business decades. Flagging.", from: "Procurement", urgent: true },
+    { text: "Proposal: officially rename 'urgent' to 'eventually'. Saves stress.", from: "Ops", urgent: false },
+    { text: "Someone replied-all to the entire company email. Requesting group counseling.", from: "Everyone", urgent: true },
+    { text: "Motion to make Mondays optional. Will circulate a poll.", from: "The Collective", urgent: false },
+    { text: "Requesting budget for a motivational penguin. For the office.", from: "Team Morale Dept", urgent: false },
+    { text: "The printer is making that noise again. The bad one.", from: "IT (Sort Of)", urgent: true },
+    { text: "Can I expense my home WiFi? I am working from home. I am at the office.", from: "Finance (Confused)", urgent: false },
+    { text: "Meeting about the meeting about last week's meeting: confirmed for Friday 4:30pm.", from: "Calendar Bot", urgent: true },
+    { text: "Requesting formal permission to say 'per my last email' without consequences.", from: "Staff (Reasonable)", urgent: false },
+    { text: "Customer wants delivery from yesterday. They are being very calm about it.", from: "Sales (Sweating)", urgent: true },
+    { text: "Team morale reading at 12%. Requesting a minimum 3 rounds of margaritas. Stat.", from: "Vibes Department", urgent: true },
+    { text: "Requesting budget for margarita/vodka allowance. Staff are taking bets on weekly count of 'I told you this 3 months ago' to one vendor.", from: "Finance (Fundraising)", urgent: false },
+    { text: "System update required. Estimated downtime: 6 to 8 business years.", from: "IT", urgent: false },
+    { text: "Can we refer to KPIs as 'Pretty Good Numbers' in next month's board report?", from: "Marketing", urgent: false },
+    { text: "Inventory discrepancy of exactly 1 unit. Requesting a full audit, a committee, and a debrief retreat.", from: "Warehouse", urgent: true },
+    { text: "Requesting a personal recovery day following this week's volume of Outlook notifications.", from: "You, Probably", urgent: true },
+    { text: "Proposal: change 'ASAP' to 'whenever you get a chance'. Morale improvement initiative.", from: "The Team Again", urgent: false },
+    { text: "The standing desk has been sitting for 8 months. Do we stand it? Or let it be?", from: "Facilities (Philosophical)", urgent: false },
+    { text: "Running out of excuses for the vendor. Need 3 new ones by EOD.", from: "Procurement (Desperate)", urgent: true },
+    { text: "We have 14 competing spreadsheet versions of the same report. Requesting a winner be declared.", from: "Everyone's Inbox", urgent: true },
+    { text: "Requesting to officially move Q4 targets to Q1. Or Q2. Or next fiscal year.", from: "Sales (Optimistic)", urgent: false },
+  ];
+
+  const APPROVE_FB = [
+    "Approved. Bold move.",
+    "Approved. We respect the confidence.",
+    "Approved. Hope this doesn't circle back.",
+    "Approved. Strong and possibly misguided.",
+    "Approved. No further questions.",
+    "Approved. Noted for the post-mortem.",
+  ];
+
+  const DELEGATE_FB = [
+    "Delegated. Assigned to: Future Sarah's Problem.",
+    "Delegated. Filed under: Not My Department.",
+    "Delegated. Forwarded to: The Void.",
+    "Delegated. Reassigned to: Aaron.",
+    "Delegated. Sent to a committee. Meeting TBD.",
+    "Delegated. This is what growth looks like.",
+    "Delegated. Whoever survives Q3 can handle this.",
+    "Delegated. Added to the backlog. Bottom of the backlog.",
+  ];
+
+  const MILESTONES = {
+    5:  "5 delegations in. You are getting it.",
+    10: "10 delegations. A natural born leader.",
+    15: "15 delegations. The delegation is strong with this one.",
+    20: "20 delegations.\nAt this rate you will have nothing left to do.\nGoals, honestly.",
+    30: "30 delegations.\nAt some point this just becomes a management philosophy.",
+  };
+
+  let approveCount = 0, delegateCount = 0, usedIdx = [];
+
+  function nextReq() {
+    if (usedIdx.length >= REQUESTS.length) usedIdx = [];
+    let i;
+    do { i = Math.floor(Math.random() * REQUESTS.length); } while (usedIdx.includes(i));
+    usedIdx.push(i);
+    return REQUESTS[i];
+  }
+
+  function renderReq() {
+    const r = nextReq();
+    document.getElementById('req-from').textContent = 'From: ' + r.from;
+    document.getElementById('req-text').textContent = r.text;
+    const badge = document.getElementById('req-badge');
+    if (r.urgent) {
+      badge.textContent = 'URGENT';
+      badge.className = 'req-badge badge-urgent';
+    } else {
+      badge.textContent = 'NORMAL';
+      badge.className = 'req-badge badge-normal';
+    }
+    document.getElementById('req-card').style.opacity = '1';
+  }
+
+  function act(type) {
+    document.getElementById('req-card').style.opacity = '0.35';
+    if (type === 'approve') {
+      approveCount++;
+      document.getElementById('ct-approve').textContent = approveCount;
+      document.getElementById('feedback').textContent = pick(APPROVE_FB);
+    } else {
+      delegateCount++;
+      document.getElementById('ct-delegate').textContent = delegateCount;
+      document.getElementById('feedback').textContent = pick(DELEGATE_FB);
+      showMilestone(delegateCount);
+    }
+    setTimeout(renderReq, 500);
+  }
+
+  function showMilestone(n) {
+    const msg = MILESTONES[n];
+    if (!msg) return;
+    const el = document.getElementById('milestone');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  function revealNext(n) {
+    const btn = document.getElementById('reveal-' + n);
+    const card = document.getElementById('card-' + n);
+    const nextBtn = document.getElementById('reveal-' + (n + 1));
+    if (btn) btn.style.display = 'none';
+    if (card) {
+      card.style.display = 'block';
+      card.style.animation = 'slideIn 0.4s ease both';
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    if (nextBtn) setTimeout(() => {
+      nextBtn.style.display = 'block';
+      nextBtn.style.animation = 'fadeUp 0.3s ease both';
+    }, 350);
+    if (n === 3) setTimeout(() => {
+      const s = document.getElementById('card-secret');
+      if (s) { s.style.display = 'inline-block'; s.style.animation = 'fadeUp 0.4s ease both'; }
+    }, 700);
+  }
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function toggleGlossary() {
+    document.getElementById('glossary').classList.toggle('open');
+  }
+
+  function startGame() {
+    approveCount = 0; delegateCount = 0; usedIdx = [];
+    document.getElementById('ct-approve').textContent = 0;
+    document.getElementById('ct-delegate').textContent = 0;
+    document.getElementById('feedback').textContent = 'Tap a button to make a decision.';
+    document.getElementById('milestone').classList.remove('show');
+    document.getElementById('s-card').classList.remove('active');
+    document.getElementById('s-game').classList.add('active');
+    renderReq();
+    confetti();
+  }
+
+  function goBack() {
+    document.getElementById('s-game').classList.remove('active');
+    document.getElementById('s-card').classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function confetti() {
+    const colours = ['#D85A30','#7F77DD','#BA7517','#1D9E75','#D4537E','#378ADD'];
+    for (let i = 0; i < 70; i++) {
+      setTimeout(() => {
+        const el = document.createElement('div');
+        el.className = 'confetti-dot';
+        const size = 6 + Math.random() * 8;
+        el.style.cssText = [
+          'left:' + (Math.random() * 100) + 'vw',
+          'top:-20px',
+          'width:' + size + 'px',
+          'height:' + size + 'px',
+          'background:' + colours[Math.floor(Math.random() * colours.length)],
+          'border-radius:' + (Math.random() > 0.5 ? '50%' : '2px'),
+          'animation-duration:' + (1.8 + Math.random() * 2.2) + 's',
+          'animation-delay:' + (Math.random() * 0.6) + 's',
+        ].join(';');
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 5000);
+      }, i * 25);
+    }
+  }
+
+  window.addEventListener('load', () => setTimeout(confetti, 400));
+</script>
+</body>
+</html>
