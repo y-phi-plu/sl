@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>For Sarah</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #F5F0FF;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 1.25rem 1rem 3rem;
+      overflow-x: hidden;
+    }
+
+    .screen { display: none; width: 100%; max-width: 420px; }
+    .screen.active { display: block; animation: fadeUp 0.35s ease; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: #fff;
+      border-radius: 24px;
+      border: 1px solid rgba(0,0,0,0.07);
+      overflow: hidden;
+    }
+
+    .card-rainbow {
+      height: 7px;
+      background: linear-gradient(90deg, #D85A30 0%, #BA7517 30%, #7F77DD 65%, #1D9E75 100%);
+    }
+
+    .card-body-wrap { padding: 1.75rem 1.5rem 1.5rem; }
+
+    .card-to {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #888780;
+      margin-bottom: 3px;
+    }
+
+    .card-name {
+      font-size: 30px;
+      font-weight: 700;
+      color: #2C2C2A;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-text {
+      font-size: 15.5px;
+      line-height: 1.75;
+      color: #444441;
+    }
+
+    .card-text p { margin-bottom: 1rem; }
+    .card-text p:last-child { margin-bottom: 0; }
+
+    .callout {
+      background: #FAECE7;
+      border-left: 3px solid #D85A30;
+      border-radius: 0 10px 10px 0;
+      padding: 0.85rem 1rem;
+      margin: 1.1rem 0;
+      font-style: italic;
+      font-size: 15px;
+      color: #3C2018;
+      line-height: 1.65;
+    }
+
+    .glossary-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #534AB7;
+      background: #EEEDFE;
+      border: none;
+      border-radius: 20px;
+      padding: 7px 14px;
+      cursor: pointer;
+      margin: 1rem 0 0;
+    }
+
+    .glossary-box {
+      display: none;
+      background: #EEEDFE;
+      border-radius: 14px;
+      padding: 1rem 1.1rem;
+      margin-top: 0.75rem;
+    }
+    .glossary-box.open { display: block; }
+
+    .glossary-heading {
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: #534AB7;
+      margin-bottom: 0.75rem;
+    }
+
+    .glossary-row {
+      display: flex;
+      gap: 10px;
+      align-items: baseline;
+      font-size: 13.5px;
+      margin-bottom: 7px;
+      color: #2C2C2A;
+    }
+    .glossary-row:last-child { margin-bottom: 0; }
+    .g-term { font-weight: 600; min-width: 52px; flex-shrink: 0; }
+    .g-def { color: #5F5E5A; line-height: 1.5; }
+
+    .sig {
+      border-top: 1px solid rgba(0,0,0,0.07);
+      margin-top: 1.5rem;
+      padding-top: 1.1rem;
+    }
+
+    .sig-from {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #888780;
+      margin-bottom: 3px;
+    }
+
+    .sig-name {
+      font-size: 19px;
+      font-weight: 600;
+      color: #2C2C2A;
+      margin-bottom: 0.6rem;
+    }
+
+    .secret-tap {
+      font-size: 12px;
+      color: #B4B2A9;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s;
+    }
+    .secret-tap:hover, .secret-tap:active { color: #D85A30; }
+
+    /* ── GAME ── */
+    .game-header {
+      background: #fff;
+      border-radius: 20px;
+      border: 1px solid rgba(0,0,0,0.07);
+      padding: 1.25rem 1.4rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .game-title { font-size: 21px; font-weight: 700; color: #2C2C2A; }
+    .game-sub { font-size: 13px; color: #888780; margin-top: 2px; }
+
+    .score-row { display: flex; gap: 8px; margin-top: 10px; }
+
+    .pill {
+      font-size: 12px;
+      border-radius: 20px;
+      padding: 4px 13px;
+    }
+    .pill-green { background: #EAF3DE; color: #3B6D11; }
+    .pill-coral { background: #FAECE7; color: #993C1D; }
+
+    .milestone-banner {
+      display: none;
+      background: #EEEDFE;
+      border-radius: 14px;
+      padding: 0.85rem 1.1rem;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: #3C3489;
+      text-align: center;
+      margin-bottom: 0.85rem;
+      line-height: 1.55;
+    }
+    .milestone-banner.show { display: block; animation: fadeUp 0.3s ease; }
+
+    .req-card {
+      background: #fff;
+      border-radius: 20px;
+      border: 1px solid rgba(0,0,0,0.07);
+      padding: 1.4rem 1.3rem 1.3rem;
+      margin-bottom: 0.85rem;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: opacity 0.25s;
+    }
+
+    .req-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .req-sender {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #888780;
+    }
+
+    .req-badge {
+      font-size: 10.5px;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-weight: 500;
+    }
+    .badge-urgent { background: #FCEBEB; color: #A32D2D; }
+    .badge-normal { background: #FAEEDA; color: #854F0B; }
+
+    .req-text {
+      font-size: 16.5px;
+      line-height: 1.55;
+      color: #2C2C2A;
+      flex: 1;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 0.85rem;
+    }
+
+    .btn-game {
+      flex: 1;
+      padding: 1rem;
+      border: none;
+      border-radius: 16px;
+      font-size: 15.5px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.12s;
+    }
+    .btn-game:active { transform: scale(0.96); }
+
+    .btn-approve { background: #EAF3DE; color: #27500A; }
+    .btn-delegate { background: #FAECE7; color: #712B13; }
+
+    .feedback-bar {
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.07);
+      border-radius: 12px;
+      padding: 0.7rem 1rem;
+      font-size: 13.5px;
+      color: #5F5E5A;
+      text-align: center;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.85rem;
+      line-height: 1.45;
+    }
+
+    .btn-back {
+      display: block;
+      width: 100%;
+      padding: 0.7rem;
+      background: none;
+      border: 1px solid rgba(0,0,0,0.1);
+      border-radius: 12px;
+      font-size: 13.5px;
+      color: #888780;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    /* ── CONFETTI ── */
+    .confetti-dot {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      border-radius: 2px;
+      animation: cf-fall linear forwards;
+    }
+    @keyframes cf-fall {
+      0%   { transform: translateY(-20px) rotate(0deg);   opacity: 1; }
+      80%  { opacity: 1; }
+      100% { transform: translateY(105vh) rotate(540deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── CARD SCREEN ── -->
+<div class="screen active" id="s-card">
+  <div class="card">
+    <div class="card-rainbow"></div>
+    <div class="card-body-wrap">
+
+      <p class="card-to">To</p>
+      <h1 class="card-name">Sarah</h1>
+
+      <div class="card-text">
+        <p>This is an official, fully-documented notification that you are an excellent boss.</p>
+
+        <p>You show up with energy when the rest of us are running on fumes. You make real decisions without making people feel stupid for asking. You care — about the work, and about the people doing it.</p>
+
+        <div class="callout">
+          "You are the Operations Director. But also, somehow, the entire vibe of this place."
+        </div>
+
+        <p>We see you working hard. We also see that you are a human person who is allowed to have a difficult week, close Outlook at 5pm, and let some things wait until Monday. The company will survive. We promise.</p>
+
+        <p>You have got this. And if you don't have this right now — that is also completely fine. We will still be here. Probably in a meeting about a meeting.</p>
+      </div>
+
+      <button class="glossary-toggle" onclick="toggleGlossary()">
+        &#128218;&nbsp; Modern Communication Decoder
+      </button>
+
+      <div class="glossary-box" id="glossary">
+        <p class="glossary-heading">Official Emoji &amp; Abbreviation Reference Guide (v1.0)</p>
+
+        <div class="glossary-row">
+          <span class="g-term">LOL</span>
+          <span class="g-def">Laughing Out Loud. A positive expression. Not a sign-off.</span>
+        </div>
+        <div class="glossary-row">
+          <span class="g-term">FR</span>
+          <span class="g-def">For Real. Expresses sincerity. Unrelated to France.</span>
+        </div>
+        <div class="glossary-row">
+          <span class="g-term">NGL</span>
+          <span class="g-def">Not Gonna Lie. A honesty disclaimer before a strong opinion.</span>
+        </div>
+        <div class="glossary-row">
+          <span class="g-term">IKR</span>
+          <span class="g-def">I Know, Right? Full agreement. Often used enthusiastically.</span>
+        </div>
+        <div class="glossary-row">
+          <span class="g-term">SMH</span>
+          <span class="g-def">Shaking My Head. Mild to moderate disappointment. Not a medical term.</span>
+        </div>
+        <div class="glossary-row">
+          <span class="g-term">&#128293;</span>
+          <span class="g-def">Fire emoji. Means something is extremely good OR everything is in crisis. Context dependent.</span>
+        </div>
+        <div class="glossary-row">
+          <span class="g-term">&#128128;</span>
+          <span class="g-def">Skull emoji. Extremely bad situation, OR something was so funny it was fatal. Tone matters.</span>
+        </div>
+        <div class="glossary-row">
+          <span class="g-term">&#128557;</span>
+          <span class="g-def">Crying laughing face. Positive. Despite visual appearance, no one is upset.</span>
+        </div>
+        <div class="glossary-row">
+          <span class="g-term">&#129300;</span>
+          <span class="g-def">Thinking face. Deep in thought, OR mild concern, OR passive disagreement.</span>
+        </div>
+        <div class="glossary-row">
+          <span class="g-term">&#129488;</span>
+          <span class="g-def">Face with spiral eyes. Overwhelmed. Used when words are insufficient.</span>
+        </div>
+      </div>
+
+      <div class="sig">
+        <p class="sig-from">From</p>
+        <p class="sig-name">Phi &#129505;</p>
+        <p class="secret-tap" onclick="startGame()">p.s. this card has a secret. tap here.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ── GAME SCREEN ── -->
+<div class="screen" id="s-game">
+  <div class="game-header">
+    <p class="game-title">The Delegation Desk</p>
+    <p class="game-sub">Your inbox. Infinite. Your call.</p>
+    <div class="score-row">
+      <span class="pill pill-green">Approved: <span id="ct-approve">0</span></span>
+      <span class="pill pill-coral">Delegated: <span id="ct-delegate">0</span></span>
+    </div>
+  </div>
+
+  <div class="milestone-banner" id="milestone"></div>
+
+  <div class="req-card" id="req-card">
+    <div class="req-meta">
+      <span class="req-sender" id="req-from">From: —</span>
+      <span class="req-badge" id="req-badge">NORMAL</span>
+    </div>
+    <p class="req-text" id="req-text">Loading…</p>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn-game btn-approve"  onclick="act('approve')">Approve</button>
+    <button class="btn-game btn-delegate" onclick="act('delegate')">Delegate</button>
+  </div>
+
+  <div class="feedback-bar" id="feedback">Tap a button to make a decision.</div>
+
+  <button class="btn-back" onclick="goBack()">&#8592; Back to card</button>
+</div>
+
+<script>
+  const REQUESTS = [
+    { text: "Can we move the ERP go-live to never?", from: "Anonymous", urgent: true },
+    { text: "I need approval to order 47 Post-it notes. It is urgent.", from: "Supply Chain", urgent: false },
+    { text: "Someone ate my lunch again. Requesting full HR intervention and a food audit.", from: "Staff (Hungry)", urgent: true },
+    { text: "Quick question — can we undo last quarter?", from: "Finance", urgent: true },
+    { text: "Requesting an emergency nap room in Conference Room B. For productivity.", from: "The Team", urgent: false },
+    { text: "Vendor has confirmed delivery in 2–4 business decades. Flagging.", from: "Procurement", urgent: true },
+    { text: "Proposal: officially rename 'urgent' to 'eventually'. Saves stress.", from: "Ops", urgent: false },
+    { text: "Someone replied-all to the entire company email. Requesting group counseling.", from: "Everyone", urgent: true },
+    { text: "Motion to make Mondays optional. Will circulate a poll.", from: "The Collective", urgent: false },
+    { text: "Requesting budget for a motivational penguin. For the office.", from: "Team Morale Dept", urgent: false },
+    { text: "The printer is making that noise again. The bad one.", from: "IT (Sort Of)", urgent: true },
+    { text: "Can I expense my home WiFi? I am working from home. I am at the office.", from: "Finance (Confused)", urgent: false },
+    { text: "Meeting about the meeting about last week's meeting: confirmed for Friday 4:30pm.", from: "Calendar Bot", urgent: true },
+    { text: "Requesting formal permission to say 'per my last email' without consequences.", from: "Staff (Reasonable)", urgent: false },
+    { text: "Customer wants delivery from yesterday. They are being very calm about it.", from: "Sales (Sweating)", urgent: true },
+    { text: "Team morale reading at 12%. Requesting a minimum 3 boxes of donuts. Stat.", from: "Vibes Department", urgent: true },
+    { text: "System update required. Estimated downtime: 6 to 8 business years.", from: "IT", urgent: false },
+    { text: "Can we refer to KPIs as 'Pretty Good Numbers' in next month's board report?", from: "Marketing", urgent: false },
+    { text: "Inventory discrepancy of exactly 1 unit. Requesting a full audit, a committee, and a debrief retreat.", from: "Warehouse", urgent: true },
+    { text: "Requesting a personal recovery day following this week's volume of Outlook notifications.", from: "You, Probably", urgent: true },
+    { text: "Proposal: change 'ASAP' to 'whenever you get a chance'. Morale improvement initiative.", from: "The Team Again", urgent: false },
+    { text: "The standing desk has been sitting for 8 months. Do we stand it? Or let it be?", from: "Facilities (Philosophical)", urgent: false },
+    { text: "Running out of excuses for the vendor. Need 3 new ones by EOD.", from: "Procurement (Desperate)", urgent: true },
+    { text: "We have 14 competing spreadsheet versions of the same report. Requesting a winner be declared.", from: "Everyone's Inbox", urgent: true },
+    { text: "Requesting to officially move Q4 targets to Q1. Or Q2. Or next fiscal year.", from: "Sales (Optimistic)", urgent: false },
+  ];
+
+  const APPROVE_FB = [
+    "Approved. Bold move.",
+    "Approved. We respect the confidence.",
+    "Approved. Hope this doesn't circle back.",
+    "Approved. Strong and possibly misguided.",
+    "Approved. No further questions.",
+    "Approved. Noted for the post-mortem.",
+  ];
+
+  const DELEGATE_FB = [
+    "Delegated. Assigned to: Future Sarah's Problem.",
+    "Delegated. Filed under: Not My Department.",
+    "Delegated. Forwarded to: The Void.",
+    "Delegated. Reassigned to: Aaron.",
+    "Delegated. Sent to a committee. Meeting TBD.",
+    "Delegated. This is what growth looks like.",
+    "Delegated. Whoever survives Q3 can handle this.",
+    "Delegated. Added to the backlog. Bottom of the backlog.",
+  ];
+
+  const MILESTONES = {
+    5:  "5 delegations in. You are getting it.",
+    10: "10 delegations. A natural born leader.",
+    15: "15 delegations. The delegation is strong with this one.",
+    20: "20 delegations.\nAt this rate you will have nothing left to do.\nGoals, honestly.",
+    30: "30 delegations.\nAt some point this just becomes a management philosophy.",
+  };
+
+  let approveCount = 0, delegateCount = 0, usedIdx = [];
+
+  function nextReq() {
+    if (usedIdx.length >= REQUESTS.length) usedIdx = [];
+    let i;
+    do { i = Math.floor(Math.random() * REQUESTS.length); } while (usedIdx.includes(i));
+    usedIdx.push(i);
+    return REQUESTS[i];
+  }
+
+  function renderReq() {
+    const r = nextReq();
+    document.getElementById('req-from').textContent = 'From: ' + r.from;
+    document.getElementById('req-text').textContent = r.text;
+    const badge = document.getElementById('req-badge');
+    if (r.urgent) {
+      badge.textContent = 'URGENT';
+      badge.className = 'req-badge badge-urgent';
+    } else {
+      badge.textContent = 'NORMAL';
+      badge.className = 'req-badge badge-normal';
+    }
+    document.getElementById('req-card').style.opacity = '1';
+  }
+
+  function act(type) {
+    document.getElementById('req-card').style.opacity = '0.35';
+    if (type === 'approve') {
+      approveCount++;
+      document.getElementById('ct-approve').textContent = approveCount;
+      document.getElementById('feedback').textContent = pick(APPROVE_FB);
+    } else {
+      delegateCount++;
+      document.getElementById('ct-delegate').textContent = delegateCount;
+      document.getElementById('feedback').textContent = pick(DELEGATE_FB);
+      showMilestone(delegateCount);
+    }
+    setTimeout(renderReq, 500);
+  }
+
+  function showMilestone(n) {
+    const msg = MILESTONES[n];
+    if (!msg) return;
+    const el = document.getElementById('milestone');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function toggleGlossary() {
+    document.getElementById('glossary').classList.toggle('open');
+  }
+
+  function startGame() {
+    approveCount = 0; delegateCount = 0; usedIdx = [];
+    document.getElementById('ct-approve').textContent = 0;
+    document.getElementById('ct-delegate').textContent = 0;
+    document.getElementById('feedback').textContent = 'Tap a button to make a decision.';
+    document.getElementById('milestone').classList.remove('show');
+    document.getElementById('s-card').classList.remove('active');
+    document.getElementById('s-game').classList.add('active');
+    renderReq();
+    confetti();
+  }
+
+  function goBack() {
+    document.getElementById('s-game').classList.remove('active');
+    document.getElementById('s-card').classList.add('active');
+  }
+
+  function confetti() {
+    const colours = ['#D85A30','#7F77DD','#BA7517','#1D9E75','#D4537E','#378ADD'];
+    for (let i = 0; i < 70; i++) {
+      setTimeout(() => {
+        const el = document.createElement('div');
+        el.className = 'confetti-dot';
+        const size = 6 + Math.random() * 8;
+        el.style.cssText = [
+          'left:' + (Math.random() * 100) + 'vw',
+          'top:-20px',
+          'width:' + size + 'px',
+          'height:' + size + 'px',
+          'background:' + colours[Math.floor(Math.random() * colours.length)],
+          'border-radius:' + (Math.random() > 0.5 ? '50%' : '2px'),
+          'animation-duration:' + (1.8 + Math.random() * 2.2) + 's',
+          'animation-delay:' + (Math.random() * 0.6) + 's',
+        ].join(';');
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 5000);
+      }, i * 25);
+    }
+  }
+
+  window.addEventListener('load', () => setTimeout(confetti, 400));
+</script>
+</body>
+</html>
