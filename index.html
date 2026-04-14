@@ -345,6 +345,28 @@
   <button class="btn-back" onclick="goBack()">&#8592; Back to card</button>
 </div>
 
+<!-- END SCREEN -->
+<div class="screen" id="s-end">
+  <div class="game-header" style="text-align:center; padding: 2rem 1.4rem;">
+    <p style="font-size: 36px; margin-bottom: 0.5rem;">&#127881;</p>
+    <p class="game-title">Inbox: Zero.</p>
+    <p class="game-sub" style="margin-top: 4px;">You did it. It's gone. All of it.</p>
+  </div>
+
+  <div style="background:#fff; border-radius:20px; border:1px solid rgba(0,0,0,0.07); padding: 1.4rem; margin-bottom: 0.85rem;">
+    <div class="score-row" style="justify-content: center; gap: 16px; margin-bottom: 1.1rem;">
+      <span class="pill pill-green" style="font-size:14px; padding: 6px 18px;">Approved: <span id="end-approve">0</span></span>
+      <span class="pill pill-coral" style="font-size:14px; padding: 6px 18px;">Delegated: <span id="end-delegate">0</span></span>
+    </div>
+    <p id="end-roast" style="font-size: 15.5px; line-height: 1.7; color: #444441; text-align: center;"></p>
+  </div>
+
+  <div style="display:flex; gap:10px; margin-bottom:0.85rem;">
+    <button class="btn-game btn-approve" style="font-size:14px;" onclick="startGame()">Play again</button>
+    <button class="btn-game btn-delegate" style="font-size:14px;" onclick="goBack()">&#8592; Back to card</button>
+  </div>
+</div>
+
 
 <script>
   const REQUESTS = [
@@ -441,7 +463,36 @@
       document.getElementById('feedback').textContent = pick(DELEGATE_FB);
       showMilestone(delegateCount);
     }
-    setTimeout(renderReq, 500);
+    const total = approveCount + delegateCount;
+    if (total >= REQUESTS.length) {
+      setTimeout(showEnd, 600);
+    } else {
+      setTimeout(renderReq, 500);
+    }
+  }
+
+  function showEnd() {
+    document.getElementById('s-game').classList.remove('active');
+    document.getElementById('s-end').classList.add('active');
+    document.getElementById('end-approve').textContent = approveCount;
+    document.getElementById('end-delegate').textContent = delegateCount;
+    const pct = delegateCount / REQUESTS.length;
+    let roast;
+    if (delegateCount === 0) {
+      roast = "You approved everything. Every. Single. One. No notes, no questions. Either you trust this team completely or you just weren't reading them. Either way - inbox zero. Respect.";
+    } else if (pct <= 0.2) {
+      roast = "You only delegated " + delegateCount + " of them. " + delegateCount + ". You could have let so many of these go and you just... didn't. Inbox clear though. That's something.";
+    } else if (pct <= 0.5) {
+      roast = "A balanced approach. " + delegateCount + " delegated, " + approveCount + " approved. Very diplomatic. Very fair. Inbox clear and everyone has a task they didn't ask for. Leadership.";
+    } else if (pct <= 0.8) {
+      roast = "Delegated " + delegateCount + " out of " + REQUESTS.length + ". Honestly? Good. That's what the team is there for. Your inbox is clear and you have plausible deniability on most of it.";
+    } else if (delegateCount === REQUESTS.length) {
+      roast = "You delegated literally everything. Not a single approval. The inbox is clear, the team is buried, and you have achieved true operational nirvana. We're taking notes.";
+    } else {
+      roast = "Almost everything delegated. " + approveCount + " approved - presumably the ones you couldn't explain to anyone else. Inbox clear. Future Sarah has done an incredible job.";
+    }
+    document.getElementById('end-roast').textContent = roast;
+    confetti();
   }
 
   function showMilestone(n) {
@@ -486,6 +537,7 @@
     document.getElementById('feedback').textContent = 'Tap a button to make a decision.';
     document.getElementById('milestone').classList.remove('show');
     document.getElementById('s-card').classList.remove('active');
+    document.getElementById('s-end').classList.remove('active');
     document.getElementById('s-game').classList.add('active');
     renderReq();
     confetti();
